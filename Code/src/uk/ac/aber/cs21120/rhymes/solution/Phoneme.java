@@ -5,8 +5,8 @@ import uk.ac.aber.cs21120.rhymes.interfaces.Arpabet;
 
 public class Phoneme implements IPhoneme {
 
-    private Arpabet phoneme;
-    private int stress;
+    Arpabet phoneme;
+    int stress;
 
     /**
      * Constructor for phoneme objects
