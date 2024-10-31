@@ -35,7 +35,6 @@ public class Pronunciation implements IPronunciation {
         return listOfPhonemes;
     }
 
-
     /**
      * Returns the index of final vowel in the list, with stressed vowels being
      * prioritised then secondary, then unstressed. If no vowel is found, -1 is
