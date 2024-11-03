@@ -3,6 +3,7 @@ package uk.ac.aber.cs21120.rhymes.solution;
 import uk.ac.aber.cs21120.rhymes.interfaces.IDictionary;
 import uk.ac.aber.cs21120.rhymes.interfaces.IWord;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -64,6 +65,30 @@ public class Dictionary implements IDictionary {
 
     @Override
     public void parseDictionaryLine(String line) {
+//        String[] splitLine = new String[]{line};
+        String splitComment = line;
+        String splitWord;
+        String splitPronunciation;
+
+        /*
+          Remove line comments and the singular whitespace before it
+          https://stackoverflow.com/questions/4419000/regex-match-everything-after-question-mark
+         */
+        if (line.contains("#")) {
+            splitComment = Arrays.toString(line.split(".#(.*)"));
+            System.out.println(splitComment);
+        }
+
+        //Split word and pronunciation
+//        splitWord = Arrays.toString(splitComment.split())
+        //https://stackoverflow.com/questions/1400431/regular-expression-match-any-word-until-first-space
+        splitPronunciation = Arrays.toString(splitComment.split("^\\S*."));
+        System.out.println(splitPronunciation);
+
+
+
+
+
 
     }
 
