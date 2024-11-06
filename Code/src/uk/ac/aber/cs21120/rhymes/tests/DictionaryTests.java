@@ -16,7 +16,7 @@ public class DictionaryTests {
 
     // The location of the CMU dictionary file
     // CHANGE THIS TO THE LOCATION OF YOUR DICTIONARY FILE
-    public static final String CMU_DICT = "C:/Users/benha/Documents/IntelliJ Projects/CS21120_Assignment-main/Code/cmudict.dict";
+    public static final String CMU_DICT = "C:/Users/benha/Documents/IntelliJ_Projects/CS21120_Assignment-main/Code/cmudict.dict";
     //c:/users/jim/ideaProjects/rhymes/cmudict.dict
 
     /**
@@ -388,6 +388,7 @@ public class DictionaryTests {
 
         assertEquals(126046, d.getWordCount());
         assertEquals(135155, d.getPronunciationCount());
+
     }
 
     /**

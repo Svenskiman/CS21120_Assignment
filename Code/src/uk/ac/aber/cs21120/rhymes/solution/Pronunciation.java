@@ -1,5 +1,6 @@
 package uk.ac.aber.cs21120.rhymes.solution;
 
+import uk.ac.aber.cs21120.rhymes.interfaces.Arpabet;
 import uk.ac.aber.cs21120.rhymes.interfaces.IPhoneme;
 import uk.ac.aber.cs21120.rhymes.interfaces.IPronunciation;
 
@@ -36,7 +37,7 @@ public class Pronunciation implements IPronunciation {
     }
 
     /**
-     * Returns the index of final vowel in the list, with stressed vowels being
+     * Returns the index of the final vowel in the list, with stressed vowels being
      * prioritised then secondary, then unstressed. If no vowel is found, -1 is
      * returned.
      * @return the index of the final stressed vowel in the pronunciation or -1
@@ -82,9 +83,30 @@ public class Pronunciation implements IPronunciation {
         return Math.max(indexUnstressed, indexStressed_2);
     }
 
-    //STUB METHOD, COMPLETE LATER
+
     @Override
     public boolean rhymesWith(IPronunciation other) {
+
+        int thisPhonemeStressedVowelIndex = findFinalStressedVowelIndex();
+        int endOfPhonemesList = listOfPhonemes.size() - 1;
+        IPhoneme fromLastStressedVowel;
+        Arpabet fromLastStressedArpa;
+        List<Arpabet> phonemesAfterVowel = new ArrayList<>();
+
+        if (thisPhonemeStressedVowelIndex != endOfPhonemesList) {
+            for (int i = thisPhonemeStressedVowelIndex; i < endOfPhonemesList; i++) {
+                fromLastStressedVowel = getPhonemes().get(thisPhonemeStressedVowelIndex);
+                fromLastStressedArpa = fromLastStressedVowel.getArpabet();
+                phonemesAfterVowel.add(fromLastStressedArpa);
+            }
+        }
+
+        int otherPhonemeStressedVowelIndex = other.findFinalStressedVowelIndex();
+        int otherEndOfPhonemesList = other.getPhonemes().size() - 1;
+        IPhoneme otherFromLastStressedVowel;
+        Arpabet otherFromLastStressedArpa;
+        List<Arpabet> otherPhonemesAfterVowel = new ArrayList<>();
+        
         return false;
     }
 }
