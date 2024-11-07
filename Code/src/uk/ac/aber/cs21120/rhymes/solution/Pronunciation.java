@@ -84,29 +84,55 @@ public class Pronunciation implements IPronunciation {
     }
 
 
+    //TALK ABOUT WANTING TO USE A LAMDA EXPRESSION TO REDUCE CODE DUPLICATION BUT COULDNT
+    //DUE TO Multiple non-overriding abstract methods found in interface errors
+    //TALK ABOUT WORK AROUND USING FUNCTIONAL INTERFACES
+    //https://www.thesunflowerlab.com/java-lambda-expression/
     @Override
     public boolean rhymesWith(IPronunciation other) {
 
-        int thisPhonemeStressedVowelIndex = findFinalStressedVowelIndex();
-        int endOfPhonemesList = listOfPhonemes.size() - 1;
-        IPhoneme fromLastStressedVowel;
-        Arpabet fromLastStressedArpa;
-        List<Arpabet> phonemesAfterVowel = new ArrayList<>();
+        //Index of the last stressed phoneme
+        int phonemeStressedVowelIndex;
+        //Index of the last phoneme
+        int endOfPhonemesList;
+        IPhoneme phoneme;
+        Arpabet arpa;
+        //Store the last phonemes for this pronunciation
+        List<Arpabet> thisPhonemesAfterVowel = new ArrayList<>();
+        //Store the last phonemes for the other pronunciation
+        List<Arpabet> otherPhonemesAfterVowel = new ArrayList<>();
 
-        if (thisPhonemeStressedVowelIndex != endOfPhonemesList) {
-            for (int i = thisPhonemeStressedVowelIndex; i < endOfPhonemesList; i++) {
-                fromLastStressedVowel = getPhonemes().get(thisPhonemeStressedVowelIndex);
-                fromLastStressedArpa = fromLastStressedVowel.getArpabet();
-                phonemesAfterVowel.add(fromLastStressedArpa);
+        //Get the last stressed vowel and all subsequent phonemes for this pronunciation
+        phonemeStressedVowelIndex = findFinalStressedVowelIndex();
+        endOfPhonemesList = getPhonemes().size() - 1;
+        //If the index of the last stressed vowel is not the last phoneme
+        if (phonemeStressedVowelIndex != endOfPhonemesList) {
+            //Iterate through phonemes, starting from the last stressed vowel
+            for (int i = phonemeStressedVowelIndex; i < endOfPhonemesList; i++) {
+                phoneme = getPhonemes().get(i);
+                arpa = phoneme.getArpabet();
+                thisPhonemesAfterVowel.add(arpa);
             }
         }
+        else {
+            thisPhonemesAfterVowel.add(getPhonemes().get(phonemeStressedVowelIndex).getArpabet());
+        }
 
-        int otherPhonemeStressedVowelIndex = other.findFinalStressedVowelIndex();
-        int otherEndOfPhonemesList = other.getPhonemes().size() - 1;
-        IPhoneme otherFromLastStressedVowel;
-        Arpabet otherFromLastStressedArpa;
-        List<Arpabet> otherPhonemesAfterVowel = new ArrayList<>();
-        
-        return false;
+        //Get the last stressed vowel and all subsequent phonemes for the other pronunciation
+        phonemeStressedVowelIndex = other.findFinalStressedVowelIndex();
+        endOfPhonemesList = other.getPhonemes().size() - 1;
+        if (phonemeStressedVowelIndex != endOfPhonemesList) {
+            for (int i = phonemeStressedVowelIndex; i < endOfPhonemesList; i++) {
+                phoneme = other.getPhonemes().get(i);
+                arpa = phoneme.getArpabet();
+                otherPhonemesAfterVowel.add(arpa);
+            }
+        }
+        else {
+            otherPhonemesAfterVowel.add(getPhonemes().get(phonemeStressedVowelIndex).getArpabet());
+        }
+
+        //Compare the two pronunciations phonemes
+        return thisPhonemesAfterVowel.equals(otherPhonemesAfterVowel);
     }
 }
