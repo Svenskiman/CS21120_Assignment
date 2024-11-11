@@ -6,10 +6,7 @@ import uk.ac.aber.cs21120.rhymes.interfaces.IPronunciation;
 import uk.ac.aber.cs21120.rhymes.interfaces.IWord;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Scanner;
-import java.util.Set;
-
+import java.util.*;
 
 
 public class Dictionary implements IDictionary {
@@ -192,9 +189,47 @@ public class Dictionary implements IDictionary {
         }
     }
 
+    /**
+     *
+     * @param word the word to get rhymes for
+     * @return
+     * @throws IllegalArgumentException
+     */
     @Override
-    public Set<String> getRhymes(String word) {
-//        return Set.of();
-        return null;
+    public Set<String> getRhymes(String word) throws IllegalArgumentException {
+        if (word == null || wordDict.get(word) == null) {
+            throw new IllegalArgumentException("Provided word is null or does not exist in the dictionary");
+        }
+        Set<String> rhymes = new HashSet<>();
+        //Get the pronunciations of the passed string
+        IWord givenWord = wordDict.get(word);
+        Set<IPronunciation> givenPronunciations = givenWord.getPronunciations();
+
+        /*
+           For each pronunciation of the provided word/string - loops at most 4 times,
+           the max number of pronunciations a word has.
+         */
+        for (IPronunciation pronunciation : givenPronunciations) {
+
+            //For each word in the dictionary
+            for (Map.Entry<String, IWord> entry : wordDict.entrySet()) {
+                String key = entry.getKey();
+                IWord value = entry.getValue();
+                Set<IPronunciation> valuesPronunciations = value.getPronunciations();
+
+                //For each pronunciation of the dictionary's word - also loops at most 4 times
+                for (IPronunciation dictWordPronunciation : valuesPronunciations) {
+                    /*
+                       If a pronunciation rhymes with the given word, add it to the set and
+                       then break the loop, moving onto the next word.
+                     */
+                    if (pronunciation.rhymesWith(dictWordPronunciation)) {
+                        rhymes.add(key);
+                        break;
+                    }
+                }
+            }
+        }
+        return rhymes;
     }
 }
