@@ -3,15 +3,20 @@ package uk.ac.aber.cs21120.rhymes.solution;
 import uk.ac.aber.cs21120.rhymes.interfaces.IPhoneme;
 import uk.ac.aber.cs21120.rhymes.interfaces.Arpabet;
 
+/**
+ * This class constructs phoneme objects which are used to construct a word's pronunciation.
+ * Each phoneme consists of an ARPABET enum and an optional stress value, which dictates
+ * whether the phoneme is a vowel.
+ */
 public class Phoneme implements IPhoneme {
 
     Arpabet phoneme;
     int stress;
 
     /**
-     * Constructor for phoneme objects
-     * @param phoneme is the phonemes ARPABET enum
-     * @param stress is the phonemes stress value
+     * Constructor for phoneme objects.
+     * @param phoneme is the phonemes ARPABET enum.
+     * @param stress is the phonemes stress value.
      * @throws IllegalArgumentException when the provided phoneme is null, or when the provided stress
      * is out of range, or when the provided stress is not suitable for the provided phoneme type.
      */
@@ -36,8 +41,8 @@ public class Phoneme implements IPhoneme {
     }
 
     /**
-     * Getter method for the phonemes ARPABET value
-     * @return phoneme
+     * Getter method for the phonemes ARPABET enum.
+     * @return phoneme.
      */
     @Override
     public Arpabet getArpabet() {
@@ -45,8 +50,8 @@ public class Phoneme implements IPhoneme {
     }
 
     /**
-     * Getter method for the phonemes stress
-     * @return stress
+     * Getter method for the phonemes stress.
+     * @return stress.
      */
     @Override
     public int getStress() {
@@ -54,10 +59,10 @@ public class Phoneme implements IPhoneme {
     }
 
     /**
-     * Checks if two phonemes share the same ARPABET value
-     * @param other is the phoneme object we are comparing to
-     * @return true if both phonemes have the same ARPABET value
-     * @throws IllegalArgumentException if the other phoneme is null
+     * Checks if two phonemes share the same ARPABET enum.
+     * @param other is the phoneme object we are comparing to.
+     * @return true if both phonemes have the same ARPABET enum.
+     * @throws IllegalArgumentException if the other phoneme is null.
      */
     @Override
     public boolean hasSameArpabet(IPhoneme other) throws IllegalArgumentException {

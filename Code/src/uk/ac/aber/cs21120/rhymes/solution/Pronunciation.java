@@ -7,15 +7,20 @@ import uk.ac.aber.cs21120.rhymes.interfaces.IPronunciation;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class constructs pronunciation objects which represent a word in the
+ * CMU pronouncing dictionary. Each pronunciation is made from a list of phonemes,
+ * which themselves, are made up of ARPABET enums and optional stress integers.
+ */
 public class Pronunciation implements IPronunciation {
 
     //Create an empty list of phonemes
     List<IPhoneme> listOfPhonemes = new ArrayList<>();
 
     /**
-     * Adds a phoneme object to the end of the list
-     * @param phoneme the phoneme to add
-     * @throws IllegalArgumentException if the phoneme object is null
+     * Adds a phoneme object to the end of the list.
+     * @param phoneme the phoneme to add.
+     * @throws IllegalArgumentException if the phoneme object is null.
      */
     @Override
     public void add(IPhoneme phoneme) throws IllegalArgumentException {
@@ -28,8 +33,8 @@ public class Pronunciation implements IPronunciation {
     }
 
     /**
-     * Getter method for the list of phonemes
-     * @return the list of phonemes that make up the pronunciation
+     * Getter method for the list of phonemes.
+     * @return the list of phonemes that make up the pronunciation.
      */
     @Override
     public List<IPhoneme> getPhonemes() {
@@ -38,7 +43,7 @@ public class Pronunciation implements IPronunciation {
 
     /**
      * Returns the index of the final vowel in the list, with stressed vowels being
-     * prioritised then secondary, then unstressed. If no vowel is found, -1 is
+     * prioritised, then secondary, then unstressed. If no vowel is found, -1 is
      * returned.
      * @return the index of the final stressed vowel in the pronunciation or -1
      */
@@ -50,15 +55,13 @@ public class Pronunciation implements IPronunciation {
         int indexStressed_2 = -1;
 
         /*
-          Iterate through the list from right to left, so we look at the last phonemes first,
-          means that we will only have to iterate through the whole list in the worst case -
-          when the list contains no vowels.
-         */
+          Iterate through the list from right to left, so we look at the last phonemes first.
+          This means that we will only have to iterate through the whole list in the worst case -
+          when the list contains no vowels, rather than every single time.
+        */
         for (int i = listOfPhonemes.size() -1 ; i >= 0 ; i--) {
             p = getPhonemes().get(i);
-            boolean pIsVowel = p.getArpabet().isVowel();
             int stress = p.getStress();
-
             if (stress == 1) {
                 return i;
             }
@@ -90,10 +93,11 @@ public class Pronunciation implements IPronunciation {
     //https://www.thesunflowerlab.com/java-lambda-expression/
 
     /**
-     *
-     * @param other the other pronunciation to compare with
-     * @return
-     * @throws IllegalArgumentException
+     * Returns true if this pronunciation rhymes with the other pronunciation.
+     * This is true if the phonemes are the same from the final stressed vowel onwards.
+     * @param other the other pronunciation to compare with.
+     * @return true if this pronunciation rhymes with the other pronunciation.
+     * @throws IllegalArgumentException if the other pronunciation is null.
      */
     @Override
     public boolean rhymesWith(IPronunciation other) throws IllegalArgumentException {
@@ -131,6 +135,7 @@ public class Pronunciation implements IPronunciation {
             for (int i = phonemeStressedVowelIndex; i <= endOfPhonemesList; i++) {
                 phoneme = getPhonemes().get(i);
                 arpa = phoneme.getArpabet();
+
                 thisPhonemesAfterVowel.add(arpa);
             }
         }
@@ -138,7 +143,11 @@ public class Pronunciation implements IPronunciation {
             thisPhonemesAfterVowel.add(getPhonemes().get(phonemeStressedVowelIndex).getArpabet());
         }
 
-        //Get the last stressed vowel and all subsequent phonemes for the other pronunciation
+        /*
+          Does what the code from line 125 to line 140 does but for the other pronunciation.
+          It would be nice to reduce code duplication by creating a function for this and then
+          passing 'this' pronunciation and the other pronunciation objects as params.
+        */
         phonemeStressedVowelIndex = other.findFinalStressedVowelIndex();
         endOfPhonemesList = other.getPhonemes().size() - 1;
         if (phonemeStressedVowelIndex != endOfPhonemesList) {

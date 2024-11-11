@@ -6,6 +6,10 @@ import uk.ac.aber.cs21120.rhymes.interfaces.IWord;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * This class constructs word objects with its given English spelling
+ * and its pronunciations.
+ */
 public class Word implements IWord {
 
     String word;
