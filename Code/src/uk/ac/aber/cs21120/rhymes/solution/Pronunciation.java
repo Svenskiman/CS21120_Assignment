@@ -62,6 +62,7 @@ public class Pronunciation implements IPronunciation {
         for (int i = listOfPhonemes.size() -1 ; i >= 0 ; i--) {
             p = getPhonemes().get(i);
             int stress = p.getStress();
+            //Loop breaks as soon as a vowel with stress of 1 is found
             if (stress == 1) {
                 return i;
             }
@@ -81,7 +82,13 @@ public class Pronunciation implements IPronunciation {
           If both variables are the same, their default value of -1 is returned
           as that means the list contains no vowels.
         */
-        return Math.max(indexUnstressed, indexStressed_2);
+
+        if (indexStressed_2 != -1 && indexUnstressed != -1) {
+            return indexStressed_2;
+        }
+        else {
+            return Math.max(indexUnstressed, indexStressed_2);
+        }
     }
 
 

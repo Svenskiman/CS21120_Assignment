@@ -302,5 +302,4 @@ public class PronunciationTests {
         p.add(new Phoneme(Arpabet.CH, -1));
         assertEquals(1, p.findFinalStressedVowelIndex());
     }
-
 }
