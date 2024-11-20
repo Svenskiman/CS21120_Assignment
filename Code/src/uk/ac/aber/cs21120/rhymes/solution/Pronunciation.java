@@ -56,8 +56,8 @@ public class Pronunciation implements IPronunciation {
 
         /*
           Iterate through the list from right to left, so we look at the last phonemes first.
-          This means that we will only have to iterate through the whole list in the worst case -
-          when the list contains no vowels, rather than every single time.
+          This means that our best case is Ω(1), which is when the last phoneme has
+          as stress of 1.
         */
         for (int i = listOfPhonemes.size() -1 ; i >= 0 ; i--) {
             p = getPhonemes().get(i);
@@ -76,28 +76,17 @@ public class Pronunciation implements IPronunciation {
         }
 
         /*
-          This code executes if no vowel is found to have a stress of 1.
-          It returns the index of the vowel that is closest to the end of
-          the list by returning the variable with the larger index value.
-          If both variables are the same, their default value of -1 is returned
-          as that means the list contains no vowels.
+          If no primary stress is found, but pronunciation contains secondary and unstressed vowels,
+          prioritise and return secondary stress index.
         */
-
         if (indexStressed_2 != -1 && indexUnstressed != -1) {
             return indexStressed_2;
         }
+        //Return unstressed index or -1
         else {
             return Math.max(indexUnstressed, indexStressed_2);
         }
     }
-
-
-    //TALK ABOUT WANTING TO USE A LAMDA EXPRESSION TO REDUCE CODE DUPLICATION BUT COULDNT
-    //DUE TO Multiple non-overriding abstract methods found in interface errors
-    //TALK ABOUT WORK AROUND USING FUNCTIONAL INTERFACES
-    //TALK ABOUT FOR LOOP BREAKING EARLY/NOT CHECKING VALUES AFTER STRESSED PHONEME DUE TO < INSTEAD OF <=
-    //GO BACK AND USE ENHANCED FOR LOOP? TO PREVENT THE CHANCE OF THIS ERROR?
-    //https://www.thesunflowerlab.com/java-lambda-expression/
 
     /**
      * Returns true if this pronunciation rhymes with the other pronunciation.
@@ -121,52 +110,50 @@ public class Pronunciation implements IPronunciation {
             return false;
         }
 
-        //Index of the last stressed phoneme
-        int phonemeStressedVowelIndex;
-        //Index of the last phoneme
-        int endOfPhonemesList;
-        IPhoneme phoneme;
-        Arpabet arpa;
         //Store the last phonemes for this pronunciation
-        List<Arpabet> thisPhonemesAfterVowel = new ArrayList<>();
+        List<Arpabet> thisPhonemesAfterVowel;
         //Store the last phonemes for the other pronunciation
-        List<Arpabet> otherPhonemesAfterVowel = new ArrayList<>();
+        List<Arpabet> otherPhonemesAfterVowel;
 
-        //Get the last stressed vowel and all subsequent phonemes for this pronunciation
-        phonemeStressedVowelIndex = findFinalStressedVowelIndex();
-        //Index of last element
-        endOfPhonemesList = getPhonemes().size() - 1;
-        //If the index of the last stressed vowel is not the last phoneme
-        if (phonemeStressedVowelIndex != endOfPhonemesList) {
-            //Iterate through phonemes, starting from the last stressed vowel
-            for (int i = phonemeStressedVowelIndex; i <= endOfPhonemesList; i++) {
-                phoneme = getPhonemes().get(i);
-                arpa = phoneme.getArpabet();
-
-                thisPhonemesAfterVowel.add(arpa);
-            }
-        }
-        else {
-            thisPhonemesAfterVowel.add(getPhonemes().get(phonemeStressedVowelIndex).getArpabet());
+        /*
+          This is the website I followed for creating my lambda expression:
+          https://www.thesunflowerlab.com/java-lambda-expression/
+        */
+        //Anonymous inner class
+        @FunctionalInterface
+        interface PhonemesAfterLastStressedVowel {
+            List<Arpabet> getPhonemesAfterVowel(IPronunciation p);
         }
 
         /*
-          Does what the code from line 125 to line 140 does but for the other pronunciation.
-          It would be nice to reduce code duplication by creating a function for this and then
-          passing 'this' pronunciation and the other pronunciation objects as params.
+          Lambda expression that returns an array list containing the last stressed vowel
+          and every phoneme after.
         */
-        phonemeStressedVowelIndex = other.findFinalStressedVowelIndex();
-        endOfPhonemesList = other.getPhonemes().size() - 1;
-        if (phonemeStressedVowelIndex != endOfPhonemesList) {
-            for (int i = phonemeStressedVowelIndex; i <= endOfPhonemesList; i++) {
-                phoneme = other.getPhonemes().get(i);
-                arpa = phoneme.getArpabet();
-                otherPhonemesAfterVowel.add(arpa);
+        PhonemesAfterLastStressedVowel phonemesAfterLastStressedVowel = (p) -> {
+            List<Arpabet> phonemesAfterVowel = new ArrayList<>();
+            int phonemeStressedVowelIndex = p.findFinalStressedVowelIndex();
+            int endOfPhonemesList = p.getPhonemes().size() - 1;
+            IPhoneme phoneme;
+            Arpabet arpa;
+
+            //If the last stressed vowel is not at the end of the pronunciation
+            if (phonemeStressedVowelIndex != endOfPhonemesList) {
+                //Iterate through phonemes, starting from the last stressed vowel
+                for (int i = phonemeStressedVowelIndex; i <= endOfPhonemesList; i++) {
+                    phoneme = p.getPhonemes().get(i);
+                    arpa = phoneme.getArpabet();
+                    phonemesAfterVowel.add(arpa);
+                }
             }
-        }
-        else {
-            otherPhonemesAfterVowel.add(other.getPhonemes().get(phonemeStressedVowelIndex).getArpabet());
-        }
+            else {
+                phonemesAfterVowel.add(p.getPhonemes().get(phonemeStressedVowelIndex).getArpabet());
+            }
+            return phonemesAfterVowel;
+        };
+
+        //Call lambda function for this and other pronunciation
+        thisPhonemesAfterVowel = phonemesAfterLastStressedVowel.getPhonemesAfterVowel(this);
+        otherPhonemesAfterVowel = phonemesAfterLastStressedVowel.getPhonemesAfterVowel(other);
 
         //Compare the two pronunciations phonemes
         return thisPhonemesAfterVowel.equals(otherPhonemesAfterVowel);

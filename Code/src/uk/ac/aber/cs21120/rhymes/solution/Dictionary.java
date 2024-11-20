@@ -15,8 +15,20 @@ import java.util.*;
  */
 public class Dictionary implements IDictionary {
 
-    //Creates a hashmap with the words spelling as key and the word object as value
-    HashMap<String, IWord> wordDict = new HashMap<>();
+    /*
+      Creates a hashmap with the words spelling as key and the word object as value.
+      By using CTRL+F in the cmudict.dict file and looking for '(' there are 9109 lines
+      with this character. This means that there are 9109 alternate pronunciations in the file.
+      Therefore, by subtracting this from 135,155 (the total number of lines of text in the file),
+      we get the number of words we need to store (126,046). If we then increment this by 1, and set
+      our loadFactor to 1 (100%), we will never have to resize our hashmap when adding data to it,
+      meaning we won't ever have to copy data over from one HashMap to another, improving the efficiency
+      of our algorithm.
+      Sources used:
+      https://docs.oracle.com/javase/8/docs/api/?java/util/HashMap.html
+      https://www.pixelstech.net/article/1588467060-When-will-resizing-be-triggered-in-Java-HashMap
+    */
+    HashMap<String, IWord> wordDict = new HashMap<>(126047, 1);
 
     /**
      * Getter method for word objects from the dictionary.
@@ -29,7 +41,7 @@ public class Dictionary implements IDictionary {
     }
 
     /**
-     * Method for adding word objects to our dictionary (hashmap).
+     * Method for adding word objects to our dictionary (wordDict).
      * @param word the word object to add.
      * @throws IllegalArgumentException if the word is already in the dictionary.
      */
@@ -59,7 +71,7 @@ public class Dictionary implements IDictionary {
         int pronunciationCount = 0;
         /*
           Iterates through each word object in the dictionary and gets its number
-          of pronunciations, totalling them up .
+          of pronunciations, totalling them up.
         */
         for (IWord word : wordDict.values()) {
             pronunciationCount += word.getPronunciations().size();
@@ -75,14 +87,6 @@ public class Dictionary implements IDictionary {
      * already in our dictionary, we add the constructed pronunciation to its list of pronunciations.
      * @param line is the string we are parsing from the cmudict
      */
-
-    //TALK ABOUT TEST ORDER 110 and 120 BEING WRONG? - GIVES THE INPUT read(1) -- THE CMUDICT
-    //DOES NOT FORMAT THE FIRST OCCURENCE OF A WORD THIS WAY, INSTEAD ITS JUST  read
-
-    //TALK ABOUT ISSUES SPLITTING INTO PRONUNCIATION AND WORD -- E.G., ARRAY INDEX 0 BEING ""
-    //https://stackoverflow.com/questions/18870699/java-string-split-sometimes-giving-blank-strings#:~:text=If%20the%20last%20matched%20index,array%20containing%20the%20same%20element.
-
-    //TALK ABOUT OUT OF BOUNDS ERROR - WAS REMOVING LAST 3 CHARACTERS FROM A WORD WITHOUT CHECKING ITS SIZE
     @Override
     public void parseDictionaryLine(String line) {
         //Arrays to store the results of string splitting
@@ -133,17 +137,17 @@ public class Dictionary implements IDictionary {
         }
 
         /*
-          The following code - (lines 138 to 176) checks if the parsed word is actually
-          just a different pronunciation, if it is, the new pronunciation is added to the
+          The following code checks if the parsed word is actually
+          just a different pronunciation. If it is, the new pronunciation is added to the
           existing word. If it isn't, a new word object is created and it, alongside its
-          pronunciation are added to the dictionary.
+          pronunciation, are added to the dictionary.
         */
         int sizeOfWord = splitWord[0].length();
         final int subtractForDigitsIndex = 2;
 
         /*
           If a word is lest than 4 characters, it cannot be an alternate pronunciation due to
-          alternate pronunciations are formatted in the cmudict as word(p).
+          alternate pronunciations are formatted in the cmudict as 'word(p)'.
         */
         if (sizeOfWord < 4) {
             IWord wordObject = new Word(splitWord[0]);
@@ -171,6 +175,8 @@ public class Dictionary implements IDictionary {
               Having checked the cmudict with ctrl+f, the most pronunciations a word has is 4, and the
               first occurrence of a word is not signified with (1). This means that the regex pattern
               only has to include numbers 2, 3 and 4.
+              IF THE CMU FILE IS CHANGED IN THE FUTURE SO SOME WORDS HAVE 5 OR MORE PRONUNCIATIONS,
+              THIS MUST BE CHANGED
             */
                 splitWord = splitWord[0].split("[(234)]");
                 IWord wordToAddPronunciationTo = getWord(splitWord[0]);
@@ -184,8 +190,6 @@ public class Dictionary implements IDictionary {
      * parses each line of data into the parseDictionaryLine method.
      * @param fileName the name and path of the CMU dictionary file.
      */
-    //TALK ABOUT ISSUES HAVING 6 MORE WORDS PARSED THAN EXPECTED - THE DICT FILE FROM THE GITHUB IS
-    //DIFFERENT TO THE ONE FROM THE UNIVERSITY LINK IN THE DOCUMENTATION
     @Override
     public void loadDictionary(String fileName) {
         String line;
@@ -218,24 +222,25 @@ public class Dictionary implements IDictionary {
         IWord givenWord = wordDict.get(word);
         Set<IPronunciation> givenPronunciations = givenWord.getPronunciations();
 
-        /*
-          For each pronunciation of the provided word/string - loops at most 4 times
-          (the max number of pronunciations a word has).
-        */
-        for (IPronunciation pronunciation : givenPronunciations) {
+        //Loops through each word in the dictionary. Code adjusted from:
+        //https://stackoverflow.com/questions/1066589/iterate-through-a-hashmap
+        for (Map.Entry<String, IWord> entry : wordDict.entrySet()) {
+            String key = entry.getKey();
+            IWord value = entry.getValue();
+            Set<IPronunciation> valuesPronunciations = value.getPronunciations();
 
-            //Loops through each word in the dictionary
-            //https://stackoverflow.com/questions/1066589/iterate-through-a-hashmap
-            for (Map.Entry<String, IWord> entry : wordDict.entrySet()) {
-                String key = entry.getKey();
-                IWord value = entry.getValue();
-                Set<IPronunciation> valuesPronunciations = value.getPronunciations();
+            /*
+              For each pronunciation of the provided word/string - loops at most 4 times,
+              but is most likely to be 1.
+            */
+            for (IPronunciation pronunciation : givenPronunciations) {
 
                 //For each pronunciation of the dictionary's word - also loops at most 4 times
                 for (IPronunciation dictWordPronunciation : valuesPronunciations) {
+
                     /*
-                      If a pronunciation rhymes with the given word, add it to the set and
-                      then break the loop, moving onto the next word.
+                      If a pronunciation rhymes with the given pronunciation, add it to the set and
+                      then break the loop, moving onto the next pronunciation.
                     */
                     if (pronunciation.rhymesWith(dictWordPronunciation)) {
                         rhymes.add(key);
